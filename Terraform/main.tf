@@ -1,4 +1,3 @@
-
 provider "google" {
   credentials = var.credentials
   project     = var.project
@@ -31,22 +30,25 @@ resource "google_compute_instance" "jenkins" {
   }
 }
 
-resource "google_compute_firewall" "default" {
-  name    = "test-firewall"
-  network = "${google_compute_network.default.name}"
+resource "null_resource" "jenkins_provisioner" {
+ 
+  connection {
+    type = "ssh"
+    user = "Gin"
+    host = "${google_compute_instance.jenkins.network_interface.0.access_config.0.nat_ip}"
+    private_key = "${file(var.private_key_path)}"
+    agent = false  
+  } 
 
-  allow {
-    protocol = "icmp"
+  provisioner "file" {
+    source      = "scenario_jenkins.sh"
+    destination = "~/scenario_jenkins.sh"
   }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["80", "8080", "1000-2000"]
+  
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x ~/scenario_jenkins.sh",
+      "sudo ~/scenario_jenkins.sh"
+    ]
   }
-
-  source_tags = ["web"]
-}
-
-resource "google_compute_network" "default" {
-  name = "test-network"
 }

@@ -29,8 +29,13 @@ variable "disk_image" {
 }
 
 variable "public_key_path" {
-  description = "ssh public key"
+  description = "Path to the ssh public key"
   default     = "./.ssh/ssh-key.pub"
+}
+
+variable "private_key_path" {
+  description = "Path to the ssh private key"
+  default     = "./.ssh/ssh-key"
 }
 
 variable "network" {
