@@ -30,7 +30,7 @@ resource "google_compute_instance" "jenkins" {
   }
 }
 
-resource "null_resource" "jenkins_provisioner" {
+resource "null_resource" "jenkins-provisioner" {
  
   connection {
     type = "ssh"
@@ -44,39 +44,16 @@ resource "null_resource" "jenkins_provisioner" {
     source      = "scenario_jenkins.sh"
     destination = "~/scenario_jenkins.sh"
   }
-  
+
+  provisioner "file" {
+    source      = "project-for-terraform.json"
+    destination = "/tmp/project-for-terraform.json"
+  }
+   
   provisioner "remote-exec" {
     inline = [
       "chmod +x ~/scenario_jenkins.sh",
       "sudo ~/scenario_jenkins.sh"
     ]
   }
-}
-
-resource "null_resource" "jenkins-8080-add-job" {
- 
-depends_on = ["null_resource.jenkins-8080-cli-unlock"]
-
-connection {
-    type = "ssh"
-    user = "erkek"
-    host = "${google_compute_instance.jenkins-8080-tf.network_interface.0.access_config.0.nat_ip}"
-    private_key = "${file(var.private_key_path)}"
-    agent = false   
-  } 
-
-  provisioner "file" {
-    source      = "./modules/jenkins-8080-tf/files/jenkins.xml"
-    destination = "~/jenkins.xml"
-
-  }
-  
-  provisioner "remote-exec" {
-    inline = [
-      "sudo java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -auth admin:admin -s 'http://localhost:8080/' create-job JenkinsDemo  < jenkins.xml"
-      #"sudo systemctl restart jenkins"
-    ]
-  
-  }
-
 }

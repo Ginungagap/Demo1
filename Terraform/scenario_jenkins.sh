@@ -15,11 +15,20 @@ sudo systemctl enable jenkins
 sudo su <<_EOF_
 mkdir -p /var/lib/jenkins/.ssh
 chmod 700 /var/lib/jenkins/.ssh
+mkdir -p /var/lib/jenkins/credentials
+chmod 700 /var/lib/jenkins/.ssh
+mv /tmp/project-for-terraform.json /var/lib/jenkins/credentials/
+chown -R jenkins:jenkins /var/lib/jenkins/.ssh
+chown -R jenkins:jenkins /var/lib/jenkins/credentials
+exit
+_EOF_
+
+sudo su -s /bin/bash jenkins <<_EOF_
 ssh-keygen -N "" -f /var/lib/jenkins/.ssh/jenkins
 chmod 600 /var/lib/jenkins/.ssh/jenkins
 chmod 600 /var/lib/jenkins/.ssh/jenkins.pub
-chown -R jenkins:jenkins /var/lib/jenkins/.ssh
 exit
 _EOF_
+
 
 echo "All Done"
