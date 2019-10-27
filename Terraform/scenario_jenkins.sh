@@ -17,6 +17,7 @@ sudo systemctl enable docker.service
 
 #create docker swarm
 sudo docker swarm init
+sudo docker network create --driver=overlay --attachable microservices-net
 
 #install jenkins
 curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo | sudo tee /etc/yum.repos.d/jenkins.repo
